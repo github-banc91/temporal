@@ -27,6 +27,7 @@
 package client
 
 import (
+	"os"
 	"time"
 
 	"go.temporal.io/api/workflowservice/v1"
@@ -169,6 +170,16 @@ func (cf *rpcClientFactory) NewMatchingClientWithTimeout(
 
 	keyResolver := newServiceKeyResolver(resolver)
 	clientProvider := func(clientKey string) (interface{}, error) {
+		println("creating new matching client - inside clientProvider with key " + clientKey)
+		broadcastIP := os.Getenv("TEMPORAL_BROADCAST_ADDRESS")
+		matchingPort := os.Getenv("MATCHING_GRPC_PORT")
+		selfClientKey := broadcastIP + ":" + matchingPort
+		println("self clientKey = " + selfClientKey)
+		if selfClientKey == clientKey {
+			println("replacing client key " + clientKey + " with " + selfClientKey)
+			clientKey = selfClientKey
+		}
+
 		connection := cf.rpcFactory.CreateInternodeGRPCConnection(clientKey)
 		return matchingservice.NewMatchingServiceClient(connection), nil
 	}
