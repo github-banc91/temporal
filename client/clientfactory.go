@@ -176,8 +176,9 @@ func (cf *rpcClientFactory) NewMatchingClientWithTimeout(
 		selfClientKey := broadcastIP + ":" + matchingPort
 		println("self clientKey = " + selfClientKey)
 		if selfClientKey == clientKey {
-			println("replacing client key " + clientKey + " with " + selfClientKey)
-			clientKey = selfClientKey
+			localClientKey := "localhost:" + matchingPort
+			println("replacing client key " + clientKey + " with " + localClientKey)
+			clientKey = localClientKey
 		}
 
 		connection := cf.rpcFactory.CreateInternodeGRPCConnection(clientKey)
